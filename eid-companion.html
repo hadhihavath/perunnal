@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eid Companion App</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --emerald: #064E3B;
+    --emerald-mid: #065f46;
+    --emerald-light: #d1fae5;
+    --gold: #D4AF37;
+    --gold-light: #f0d060;
+    --gold-pale: #fef9e7;
+    --cream: #FDFAF3;
+    --pearl: #F5F0E8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: linear-gradient(135deg, #0a2818 0%, #064E3B 40%, #0d3d28 70%, #1a5c3a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle at 20% 20%, rgba(212,175,55,0.08) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(212,175,55,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    background: #0a0a0a;
+    border-radius: 54px;
+    position: relative;
+    box-shadow:
+      0 0 0 1px #2a2a2a,
+      0 0 0 3px #1a1a1a,
+      0 30px 80px rgba(0,0,0,0.8),
+      0 10px 30px rgba(0,0,0,0.5),
+      inset 0 0 0 1px #3a3a3a;
+    overflow: hidden;
+  }
+
+  .phone-frame::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 140px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+    border-radius: 54px 54px 0 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .phone-screen {
+    position: absolute;
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    border-radius: 48px;
+    overflow: hidden;
+    background: var(--cream);
+  }
+
+  .notch {
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 126px; height: 37px;
+    background: #0a0a0a;
+    border-radius: 0 0 20px 20px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .notch-camera {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 1.5px solid #2d2d2d;
+  }
+
+  .notch-speaker {
+    width: 52px; height: 5px;
+    border-radius: 3px;
+    background: #1a1a1a;
+  }
+
+  .home-bar {
+    position: absolute;
+    bottom: 10px; left: 50%; transform: translateX(-50%);
+    width: 130px; height: 5px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.3);
+    z-index: 200;
+  }
+
+  .app-content {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 48px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    background: var(--emerald);
+    display: flex;
+    align-items: flex-end;
+    padding: 0 24px 6px;
+    justify-content: space-between;
+    position: relative;
+    z-index: 150;
+    flex-shrink: 0;
+  }
+
+  .status-time {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    font-family: 'Nunito', sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  .status-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .status-icons i {
+    font-size: 11px;
+    color: var(--gold);
+  }
+
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-content::-webkit-scrollbar { display: none; }
+
+  .bottom-nav {
+    height: 72px;
+    background: var(--emerald);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px 8px;
+    flex-shrink: 0;
+    box-shadow: 0 -2px 20px rgba(6,78,59,0.4);
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .nav-item.active {
+    background: rgba(212,175,55,0.18);
+  }
+
+  .nav-item i {
+    font-size: 20px;
+    color: rgba(212,175,55,0.5);
+    transition: all 0.3s ease;
+  }
+
+  .nav-item.active i {
+    color: var(--gold);
+    transform: translateY(-2px);
+  }
+
+  .nav-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(212,175,55,0.5);
+    letter-spacing: 0.4px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+  }
+
+  .nav-item.active .nav-label {
+    color: var(--gold);
+  }
+
+  /* HOME */
+  .home-header {
+    background: linear-gradient(160deg, var(--emerald) 0%, #0a6b4a 60%, #0d7a54 100%);
+    padding: 20px 20px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-header::after {
+    content: '☽ ✦ ☽';
+    position: absolute;
+    top: 0; right: -10px;
+    font-size: 70px;
+    opacity: 0.06;
+    color: var(--gold);
+    letter-spacing: -8px;
+    line-height: 1.1;
+    pointer-events: none;
+  }
+
+  .greeting-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+  }
+
+  .greeting-sub {
+    font-size: 12px;
+    color: rgba(212,175,55,0.8);
+    font-weight: 500;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  .eidi-card {
+    background: linear-gradient(135deg, var(--gold) 0%, #b8941f 40%, #d4af37 70%, #e8c94a 100%);
+    border-radius: 24px;
+    padding: 22px 24px;
+    margin: -20px 16px 0;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 12px 40px rgba(212,175,55,0.35), 0 4px 12px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
+
+  .eidi-card::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    pointer-events: none;
+  }
+
+  .eidi-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: -10px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
+  }
+
+  .eidi-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(6,78,59,0.8);
+  }
+
+  .eidi-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 46px;
+    font-weight: 900;
+    color: var(--emerald);
+    line-height: 1;
+    margin: 4px 0;
+  }
+
+  .eidi-meta {
+    font-size: 11px;
+    color: rgba(6,78,59,0.7);
+    font-weight: 600;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--emerald);
+    padding: 20px 20px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(6,78,59,0.2), transparent);
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 20px;
+    margin: 0 12px 8px;
+    background: white;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1.5px solid rgba(6,78,59,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .checklist-item.checked {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-color: rgba(6,78,59,0.2);
+  }
+
+  .checklist-item:active { transform: scale(0.97); }
+
+  .check-circle {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(6,78,59,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .checklist-item.checked .check-circle {
+    background: var(--emerald);
+    border-color: var(--emerald);
+  }
+
+  .check-circle i {
+    font-size: 12px;
+    color: white;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transform: scale(0);
+  }
+
+  .checklist-item.checked .check-circle i {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .check-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    transition: all 0.3s ease;
+    flex: 1;
+  }
+
+  .checklist-item.checked .check-text {
+    color: var(--emerald);
+    text-decoration: line-through;
+    text-decoration-color: rgba(6,78,59,0.4);
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 16px;
+  }
+
+  .stat-card {
+    flex: 1;
+    background: white;
+    border-radius: 16px;
+    padding: 14px 12px;
+    text-align: center;
+    border: 1.5px solid rgba(6,78,59,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--emerald);
+  }
+
+  .stat-lbl {
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* LEDGER */
+  .ledger-header {
+    background: linear-gradient(160deg, var(--emerald) 0%, #0a6b4a 100%);
+    padding: 20px 20px 28px;
+  }
+
+  .add-btn {
+    background: linear-gradient(135deg, var(--gold), #b8941f);
+    color: var(--emerald);
+    border: none;
+    border-radius: 16px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 15px rgba(212,175,55,0.4);
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .add-btn:active { transform: scale(0.96); }
+
+  .ledger-entry {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    margin: 0 12px 8px;
+    background: white;
+    border-radius: 16px;
+    border: 1.5px solid rgba(6,78,59,0.07);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px) scale(0.95); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  .entry-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .entry-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .entry-tag {
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .entry-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--emerald);
+    margin-left: auto;
+  }
+
+  .ledger-total-bar {
+    background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+    border: 1.5px solid rgba(212,175,55,0.3);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin: 14px 12px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ledger-total-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--emerald);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .ledger-total-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--emerald);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 500;
+    display: flex;
+    align-items: flex-end;
+    border-radius: 48px;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal-sheet {
+    background: var(--cream);
+    border-radius: 28px 28px 0 0;
+    padding: 24px 24px 32px;
+    width: 100%;
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--emerald);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .input-group { margin-bottom: 14px; }
+
+  .input-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--emerald);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid rgba(6,78,59,0.15);
+    border-radius: 14px;
+    font-size: 15px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    color: #1f2937;
+    background: white;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .input-field:focus { border-color: var(--emerald); }
+
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--emerald), #0a6b4a);
+    color: var(--gold);
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 6px 20px rgba(6,78,59,0.3);
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn:active { transform: scale(0.98); }
+
+  /* FEED */
+  .feed-header {
+    background: linear-gradient(160deg, var(--emerald) 0%, #0a6b4a 100%);
+    padding: 20px 20px 24px;
+  }
+
+  .feed-post {
+    margin: 0 12px 14px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1.5px solid rgba(6,78,59,0.07);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .post-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .post-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .post-time {
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .post-image-placeholder {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .post-caption {
+    padding: 10px 14px 4px;
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .post-caption strong {
+    color: var(--emerald);
+    font-weight: 700;
+  }
+
+  .post-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 14px 12px;
+  }
+
+  .like-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1.5px solid transparent;
+  }
+
+  .like-btn.liked {
+    background: #fff0f0;
+    border-color: rgba(239,68,68,0.2);
+  }
+
+  .like-btn i {
+    font-size: 15px;
+    color: #d1d5db;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .like-btn.liked i {
+    color: #ef4444;
+    transform: scale(1.2);
+  }
+
+  .like-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: #9ca3af;
+    transition: all 0.3s ease;
+  }
+
+  .like-btn.liked .like-count { color: #ef4444; }
+
+  /* SETTINGS */
+  .settings-header {
+    background: linear-gradient(160deg, var(--emerald) 0%, #0a6b4a 100%);
+    padding: 20px 20px 28px;
+  }
+
+  .profile-circle {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #b8941f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    border: 3px solid rgba(212,175,55,0.3);
+    flex-shrink: 0;
+  }
+
+  .settings-group {
+    margin: 0 12px 14px;
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1.5px solid rgba(6,78,59,0.07);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .settings-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid rgba(6,78,59,0.06);
+  }
+
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item:active { background: rgba(6,78,59,0.03); }
+
+  .settings-icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .settings-icon i { font-size: 14px; color: white; }
+
+  .settings-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    flex: 1;
+  }
+
+  .settings-value {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .toggle {
+    width: 44px; height: 24px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--emerald); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .toggle.on::after { transform: translateX(20px); }
+
+  .badge {
+    background: linear-gradient(135deg, var(--gold), #b8941f);
+    color: var(--emerald);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 8px;
+    letter-spacing: 0.3px;
+  }
+
+  .group-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9ca3af;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0 20px 8px;
+    margin-top: 4px;
+  }
+
+  .scroll-pad { padding-bottom: 16px; }
+
+  /* CONFETTI */
+  .confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
+    border-radius: 48px;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    animation: confettiFall 1.2s ease-in forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" x-data="eidApp()">
+  <div class="notch">
+    <div class="notch-speaker"></div>
+    <div class="notch-camera"></div>
+  </div>
+  <div class="home-bar"></div>
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <div class="phone-screen">
+    <div class="app-content">
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <i class="fas fa-signal"></i>
+          <i class="fas fa-wifi"></i>
+          <i class="fas fa-battery-three-quarters"></i>
+        </div>
+      </div>
+
+      <div class="tab-content">
+
+        <!-- HOME TAB -->
+        <div x-show="activeTab === 'home'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+
+          <div class="home-header">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div class="greeting-text">Eid Mubarak! 🌙</div>
+                <div class="greeting-sub">May your blessings multiply</div>
+              </div>
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#D4AF37,#b8941f);display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid rgba(212,175,55,0.4);">👤</div>
+            </div>
+          </div>
+
+          <!-- Eidi Card -->
+          <div class="eidi-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+              <div>
+                <div class="eidi-label">💰 Total Eidi Received</div>
+                <div class="eidi-amount" x-text="'₹' + ledgerEntries.reduce((s,e) => s + parseInt(e.amount), 0).toLocaleString()"></div>
+                <div class="eidi-meta" x-text="'from ' + ledgerEntries.length + ' family members · Eid 2025'"></div>
+              </div>
+              <div style="background:rgba(6,78,59,0.12);border-radius:14px;padding:8px 12px;text-align:center;">
+                <div style="font-size:11px;font-weight:700;color:rgba(6,78,59,0.7);text-transform:uppercase;letter-spacing:0.5px;">Given</div>
+                <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#064E3B;">₹800</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="section-title" style="padding-top:26px;">
+            <i class="fas fa-chart-pie" style="color:#D4AF37;font-size:14px;"></i> This Eid
+          </div>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-num" x-text="ledgerEntries.length"></div>
+              <div class="stat-lbl">Givers</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" x-text="ledgerEntries.length ? '₹' + Math.round(ledgerEntries.reduce((s,e)=>s+parseInt(e.amount),0)/ledgerEntries.length) : '₹0'"></div>
+              <div class="stat-lbl">Avg Gift</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" x-text="checklist.filter(c=>c.done).length + '/' + checklist.length"></div>
+              <div class="stat-lbl">Sunnahs</div>
+            </div>
+          </div>
+
+          <div class="section-title">
+            <i class="fas fa-star-and-crescent" style="color:#D4AF37;font-size:14px;"></i> Sunnah Checklist
+          </div>
+
+          <template x-for="(item, index) in checklist" :key="index">
+            <div class="checklist-item" :class="{ checked: item.done }" @click="toggleCheck(index)">
+              <span style="font-size:18px;" x-text="item.emoji"></span>
+              <div class="check-circle">
+                <i class="fas fa-check"></i>
+              </div>
+              <span class="check-text" x-text="item.text"></span>
+            </div>
+          </template>
+
+          <div class="scroll-pad"></div>
+        </div>
+
+        <!-- LEDGER TAB -->
+        <div x-show="activeTab === 'ledger'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+
+          <div class="ledger-header">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:white;">Eidi Ledger</div>
+                <div style="font-size:11px;color:rgba(212,175,55,0.7);font-weight:500;margin-top:2px;">Track every blessing 📖</div>
+              </div>
+              <button class="add-btn" @click="showModal = true">
+                <i class="fas fa-plus"></i> Add Entry
+              </button>
+            </div>
+          </div>
+
+          <div class="ledger-total-bar">
+            <div>
+              <div class="ledger-total-label">Total Received</div>
+              <div style="font-size:10px;color:#9ca3af;font-weight:500;" x-text="ledgerEntries.length + ' entries'"></div>
+            </div>
+            <div class="ledger-total-amount" x-text="'₹' + ledgerEntries.reduce((s,e) => s + parseInt(e.amount), 0).toLocaleString()"></div>
+          </div>
+
+          <div class="group-title" style="padding-top:8px;">All Entries</div>
+
+          <template x-for="(entry, i) in ledgerEntries" :key="i">
+            <div class="ledger-entry">
+              <div class="entry-avatar" :style="'background:' + entry.color">
+                <span x-text="entry.emoji"></span>
+              </div>
+              <div style="flex:1;">
+                <div class="entry-name" x-text="entry.name"></div>
+                <div class="entry-tag" x-text="entry.tag"></div>
+              </div>
+              <div class="entry-amount" x-text="'₹' + parseInt(entry.amount).toLocaleString()"></div>
+            </div>
+          </template>
+
+          <div class="scroll-pad"></div>
+
+          <!-- Modal -->
+          <div class="modal-overlay" x-show="showModal" @click.self="showModal = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+            <div class="modal-sheet" @click.stop>
+              <div class="modal-handle"></div>
+              <div class="modal-title">🎁 Add Eidi Entry</div>
+              <div class="input-group">
+                <label class="input-label">Giver's Name</label>
+                <input class="input-field" type="text" x-model="newEntry.name" placeholder="e.g. Uncle Ahmed">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Amount (₹)</label>
+                <input class="input-field" type="number" x-model="newEntry.amount" placeholder="e.g. 500">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Relationship</label>
+                <input class="input-field" type="text" x-model="newEntry.tag" placeholder="e.g. Maternal Uncle">
+              </div>
+              <button class="submit-btn" @click="addEntry()">
+                <i class="fas fa-check-circle" style="margin-right:6px;"></i> Save Entry
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FEED TAB -->
+        <div x-show="activeTab === 'feed'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+
+          <div class="feed-header">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:white;">Family Feed</div>
+                <div style="font-size:11px;color:rgba(212,175,55,0.7);font-weight:500;margin-top:2px;">Eid moments from loved ones 📸</div>
+              </div>
+              <div style="background:rgba(212,175,55,0.2);border-radius:12px;padding:6px 12px;cursor:pointer;">
+                <i class="fas fa-bell" style="color:#D4AF37;font-size:14px;"></i>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:12px;"></div>
+
+          <template x-for="(post, i) in feedPosts" :key="i">
+            <div class="feed-post">
+              <div class="post-header">
+                <div class="post-avatar" :style="'background:' + post.avatarBg">
+                  <span x-text="post.avatar"></span>
+                </div>
+                <div style="flex:1;">
+                  <div class="post-name" x-text="post.name"></div>
+                  <div class="post-time" x-text="post.time"></div>
+                </div>
+                <i class="fas fa-ellipsis-h" style="color:#d1d5db;font-size:14px;cursor:pointer;"></i>
+              </div>
+              <div class="post-image-placeholder" :style="'background:' + post.imgBg">
+                <span x-text="post.imgEmoji" style="font-size:56px;"></span>
+                <span style="font-size:11px;font-weight:600;opacity:0.6;" x-text="post.imgLabel"></span>
+              </div>
+              <div class="post-caption">
+                <strong x-text="post.name.split(' ')[0]"></strong>
+                <span x-text="' ' + post.caption"></span>
+              </div>
+              <div class="post-actions">
+                <div class="like-btn" :class="{ liked: post.liked }" @click="toggleLike(i)">
+                  <i :class="post.liked ? 'fas fa-heart' : 'far fa-heart'"></i>
+                  <span class="like-count" x-text="post.likes + (post.liked ? 1 : 0)"></span>
+                </div>
+                <div style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:5px 10px;">
+                  <i class="far fa-comment" style="font-size:15px;color:#d1d5db;"></i>
+                  <span style="font-size:12px;font-weight:700;color:#9ca3af;" x-text="post.comments"></span>
+                </div>
+                <div style="margin-left:auto;cursor:pointer;padding:5px 10px;">
+                  <i class="far fa-paper-plane" style="font-size:15px;color:#d1d5db;"></i>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <div class="scroll-pad"></div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div x-show="activeTab === 'settings'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+
+          <div class="settings-header">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div class="profile-circle">👳</div>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:white;">Abdullah Khan</div>
+                <div style="font-size:11px;color:rgba(212,175,55,0.7);font-weight:500;margin-top:2px;">abdullah@eidcompanion.app</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:16px;"></div>
+          <div class="group-title">Preferences</div>
+
+          <div class="settings-group">
+            <div class="settings-item">
+              <div class="settings-icon" style="background:linear-gradient(135deg,#064E3B,#0a6b4a);">
+                <i class="fas fa-moon"></i>
+              </div>
+              <span class="settings-label">Dark Mode</span>
+              <div class="toggle" :class="toggles.darkMode ? 'on' : ''" @click="toggles.darkMode = !toggles.darkMode"></div>
+            </div>
+            <div class="settings-item">
+              <div class="settings-icon" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);">
+                <i class="fas fa-bell"></i>
+              </div>
+              <span class="settings-label">Prayer Reminders</span>
+              <div class="toggle" :class="toggles.prayers ? 'on' : ''" @click="toggles.prayers = !toggles.prayers"></div>
+            </div>
+            <div class="settings-item">
+              <div class="settings-icon" style="background:linear-gradient(135deg,#d97706,#b45309);">
+                <i class="fas fa-star"></i>
+              </div>
+              <span class="settings-label">Show Confetti</span>
+              <div class="toggle" :class="toggles.confetti ? 'on' : ''" @click="toggles.confetti = !toggles.confetti"></div>
+            </div>
+          </div>
+
+          <div class="group-title">Currency & Region</div>
+          <div class="settings-group">
+            <div class="settings-item">
+              <div class="settings-icon" style="background:linear-gradient(135deg,#059669,#047857);">
+                <i class="fas fa-rupee-sign"></i>
+              </div>
+              <span class="settings-label">Currency</span>
+              <span class="settings-value">INR (₹)</span>
+              <i class="fas fa-chevron-right" style="font-size:10px;color:#d1d5db;margin-left:6px;"></i>
+            </div>
+            <div class="settings-item">
+              <div class="settings-icon" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">
+                <i class="fas fa-globe"></i>
+              </div>
+              <span class="settings-label">Language</span>
+              <span class="settings-value">English</span>
+              <i class="fas fa-chevron-right" style="font-size:10px;color:#d1d5db;margin-left:6px;"></i>
+            </div>
+          </div>
+
+          <div class="group-title">About</div>
+          <div class="settings-group">
+            <div class="settings-item">
+              <div class="settings-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
+                <i class="fas fa-heart"></i>
+              </div>
+              <span class="settings-label">Rate the App</span>
+              <div class="badge">NEW</div>
+            </div>
+            <div class="settings-item">
+              <div class="settings-icon" style="background:linear-gradient(135deg,#D4AF37,#b8941f);">
+                <i class="fas fa-info"></i>
+              </div>
+              <span class="settings-label">Version</span>
+              <span class="settings-value">1.0.0</span>
+            </div>
+          </div>
+
+          <div style="text-align:center;padding:20px 0 8px;">
+            <div style="font-family:'Playfair Display',serif;font-size:13px;color:#9ca3af;">Made with ❤️ for Eid</div>
+            <div style="font-size:11px;color:#d1d5db;margin-top:3px;">Eid Companion © 2025</div>
+          </div>
+
+          <div class="scroll-pad"></div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item" :class="{ active: activeTab === 'home' }" @click="activeTab = 'home'">
+          <i class="fas fa-home"></i>
+          <span class="nav-label">Home</span>
+        </div>
+        <div class="nav-item" :class="{ active: activeTab === 'ledger' }" @click="activeTab = 'ledger'">
+          <i class="fas fa-book-open"></i>
+          <span class="nav-label">Ledger</span>
+        </div>
+        <div class="nav-item" :class="{ active: activeTab === 'feed' }" @click="activeTab = 'feed'">
+          <i class="fas fa-images"></i>
+          <span class="nav-label">Family</span>
+        </div>
+        <div class="nav-item" :class="{ active: activeTab === 'settings' }" @click="activeTab = 'settings'">
+          <i class="fas fa-cog"></i>
+          <span class="nav-label">Settings</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function eidApp() {
+  return {
+    activeTab: 'home',
+    showModal: false,
+
+    checklist: [
+      { text: 'Perform Ghusl (ritual bath)', emoji: '🚿', done: true },
+      { text: 'Wear new or best clothes', emoji: '👘', done: true },
+      { text: 'Eat dates before Eid prayer', emoji: '🌴', done: true },
+      { text: 'Attend Eid prayer at mosque', emoji: '🕌', done: false },
+      { text: 'Visit elders & give Eid greetings', emoji: '🤝', done: false },
+      { text: 'Give to charity (Zakat al-Fitr)', emoji: '💝', done: false },
+    ],
+
+    ledgerEntries: [
+      { name: 'Uncle Ahmed', tag: 'Paternal Uncle · Just now', amount: 500, emoji: '👴', color: 'linear-gradient(135deg,#d1fae5,#a7f3d0)' },
+      { name: 'Dadi Jaan', tag: 'Paternal Grandmother · 1h ago', amount: 1000, emoji: '👵', color: 'linear-gradient(135deg,#fef3c7,#fde68a)' },
+      { name: 'Nana Abu', tag: 'Maternal Grandfather · 2h ago', amount: 750, emoji: '🧓', color: 'linear-gradient(135deg,#e0e7ff,#c7d2fe)' },
+      { name: 'Khala Razia', tag: 'Maternal Aunt · 3h ago', amount: 500, emoji: '👩', color: 'linear-gradient(135deg,#fce7f3,#fbcfe8)' },
+      { name: 'Chacha Bilal', tag: 'Paternal Uncle · Yesterday', amount: 1000, emoji: '👨', color: 'linear-gradient(135deg,#d1fae5,#a7f3d0)' },
+      { name: 'Phupho Sara', tag: 'Paternal Aunt · Yesterday', amount: 500, emoji: '👩‍🦱', color: 'linear-gradient(135deg,#fff7ed,#fed7aa)' },
+      { name: 'Mama Farooq', tag: 'Maternal Uncle · Yesterday', amount: 1000, emoji: '🧔', color: 'linear-gradient(135deg,#f0fdf4,#bbf7d0)' },
+    ],
+
+    newEntry: { name: '', amount: '', tag: '' },
+
+    feedPosts: [
+      { name: 'Ammi Jaan', avatar: '👩‍🦳', avatarBg: 'linear-gradient(135deg,#fef3c7,#fde68a)', time: 'Just now', imgBg: 'linear-gradient(135deg,#fef9c3,#fde68a,#f59e0b)', imgEmoji: '🍽️', imgLabel: 'Eid special biryani!', caption: "Made everyone's favourite biryani today! 😍 Eid Mubarak to all our loved ones! 🌙✨", likes: 14, comments: 6, liked: false },
+      { name: 'Bhai Tariq', avatar: '🧔', avatarBg: 'linear-gradient(135deg,#d1fae5,#6ee7b7)', time: '30 min ago', imgBg: 'linear-gradient(135deg,#ecfdf5,#a7f3d0,#34d399)', imgEmoji: '👗', imgLabel: 'New Eid kurta 🎉', caption: 'Rocking the new kurta this Eid! 🕌 Alhamdulillah for all the blessings. Eid Mubarak!', likes: 22, comments: 9, liked: false },
+      { name: 'Nani Ma', avatar: '👵', avatarBg: 'linear-gradient(135deg,#e0e7ff,#c7d2fe)', time: '1 hour ago', imgBg: 'linear-gradient(135deg,#f3e8ff,#ddd6fe,#a78bfa)', imgEmoji: '🎁', imgLabel: 'Eidi for everyone!', caption: 'Giving Eidi to all my grandchildren today 🥰 My heart is so full. Eid Mubarak janu!', likes: 41, comments: 17, liked: false },
+      { name: 'Cousin Zara', avatar: '👧', avatarBg: 'linear-gradient(135deg,#fce7f3,#fbcfe8)', time: '2 hours ago', imgBg: 'linear-gradient(135deg,#fff1f2,#fecdd3,#fb7185)', imgEmoji: '🌸', imgLabel: 'Mehndi from last night!', caption: "Mehndi game strong this Eid 💅🌸 Finally got to use that floral pattern I've been saving!", likes: 37, comments: 13, liked: false },
+    ],
+
+    toggles: { darkMode: false, prayers: true, confetti: true },
+
+    toggleCheck(index) {
+      this.checklist[index].done = !this.checklist[index].done;
+      if (this.checklist[index].done && this.toggles.confetti) {
+        this.launchConfetti();
+      }
+    },
+
+    toggleLike(i) {
+      this.feedPosts[i].liked = !this.feedPosts[i].liked;
+    },
+
+    addEntry() {
+      if (!this.newEntry.name || !this.newEntry.amount) return;
+      const colors = [
+        'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+        'linear-gradient(135deg,#fef3c7,#fde68a)',
+        'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+        'linear-gradient(135deg,#fce7f3,#fbcfe8)',
+        'linear-gradient(135deg,#fff7ed,#fed7aa)',
+      ];
+      const emojis = ['🧑','👨','👩','🧔','👴','👵','🧓'];
+      this.ledgerEntries.unshift({
+        name: this.newEntry.name,
+        tag: (this.newEntry.tag || 'Family Member') + ' · Just now',
+        amount: this.newEntry.amount,
+        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+      this.newEntry = { name: '', amount: '', tag: '' };
+      this.showModal = false;
+    },
+
+    launchConfetti() {
+      const container = document.getElementById('confettiContainer');
+      const colors = ['#D4AF37','#064E3B','#ef4444','#3b82f6','#f59e0b','#10b981','#8b5cf6','#ec4899','#ffffff'];
+      for (let i = 0; i < 35; i++) {
+        setTimeout(() => {
+          const piece = document.createElement('div');
+          piece.className = 'confetti-piece';
+          const size = 5 + Math.random() * 8;
+          piece.style.cssText = `
+            left: ${Math.random() * 100}%;
+            top: 0;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            width: ${size}px;
+            height: ${size}px;
+            border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+            animation-delay: ${Math.random() * 0.5}s;
+            animation-duration: ${0.9 + Math.random() * 0.7}s;
+          `;
+          container.appendChild(piece);
+          setTimeout(() => piece.remove(), 1800);
+        }, i * 25);
+      }
+    }
+  }
+}
+</script>
+</body>
+</html>
